@@ -1,16 +1,25 @@
-# This is a sample Python script.
+import json
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import paho.mqtt.client as mqtt
 
+def on_connect(client, userdata, flags, rc):
+    print('connected to the mqtt server')
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
+def on_subscribe(client, userdata, mid, granted_qos):
+    print('subscribing', str(mid))
 
+def on_message(client, userdata, msg):
+    a = str(msg.payload.decode('utf-8'))
+    print(a)
+    data = json.loads(a)
+    print(type(data))
+    print(data['data'])
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_subscribe = on_subscribe
+client.on_message = on_message
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+client.connect('117.16.243.99', 5503)
+client.subscribe('app/request', 1)
+client.loop_forever()

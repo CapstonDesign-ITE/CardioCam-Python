@@ -7,6 +7,9 @@ verify_ssl = true
 
 [packages]
 paho-mqtt = "*"
+numpy = "*"
+sklearn = "*"
+pca = "*"
 
 [requires]
 python_version = "3.8"
