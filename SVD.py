@@ -1,32 +1,21 @@
 # SVD module for CardioCam
 
 import numpy as np
-import paho.mqtt.client as mqtt
-import json
 
-def on_connect(client, userdata, flags, rc):
-    print('connected to the mqtt server')
+A = [[i**2,i,1] for i in range(1930,2020,10)]
 
-def on_subscribe(client, userdata, mid, granted_qos):
-    print('subscribing', str(mid))
+# numpy Array 로 변환
+matA = np.array(A).astype(np.float64)
 
-def on_message(client, userdata, msg):
-    a = str(msg.payload.decode('utf-8'))
-    print(a)
-    data = json.loads(a)
-    print(type(data))
-    print(data['data'])
+# svd 함수 사용하여 3개 반환값 저장
+U, s, V = np.linalg.svd(matA, full_matrices=True)
 
+# s = matA의 eigenvalue list
+# svd 이용한 근사 결과를 원본가 비교위해 s를 유사대각행렬로 변환
+S = np.zeros(matA.shape)
+for i in range(len(s)):
+    S[i][i] = s[i]
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_subscribe = on_subscribe
-client.on_message = on_message
-
-client.connect('117.16.243.99', 5503)
-client.subscribe('app/request', 1)
-client.loop_forever()
-
-
-
- 
+# 근사한 결과 계산
+appA = np.dot(U, np.dot(S,V))
+print(matA-appA)
